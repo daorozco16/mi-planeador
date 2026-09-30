@@ -269,36 +269,46 @@
   }
   .ruled-line input::placeholder{color:var(--ink-faint);}
 
-  /* ---------- Lists (goals/tasks) ---------- */
-  .list-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--card-line);}
+  /* ---------- Lists (priorities/goals/tasks) ---------- */
+  .list-row{display:flex;flex-direction:column;gap:5px;padding:8px 0;border-bottom:1px solid var(--card-line);}
   .list-row:last-child{border-bottom:none;}
+  .list-row-main{display:flex;align-items:center;gap:10px;}
+  .list-row-meta{
+    display:flex;align-items:center;gap:8px;padding-left:29px; /* alinea bajo el texto: checkbox(19)+gap(10) */
+    min-height:20px;
+  }
   .check-box{
     flex:none;width:19px;height:19px;border:1.5px solid var(--ink-faint);border-radius:4px;
     background:transparent;display:flex;align-items:center;justify-content:center;color:transparent;
   }
   .check-box svg{width:12px;height:12px;}
   .check-box[data-done="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper);}
-  .list-row input[type=text]{
+  .list-row-main input[type=text]{
     flex:1;border:none;background:transparent;font-size:14px;min-width:0;padding:3px 0;
   }
   .list-row[data-done="true"] input[type=text]{color:var(--ink-faint);text-decoration:line-through;}
   .carried-tag{
-    flex:none;font-size:10px;font-style:italic;color:var(--ink-faint);
-    white-space:nowrap;margin-right:2px;
+    flex:none;font-size:10px;font-style:italic;color:var(--ink-faint);white-space:nowrap;
   }
   .carried-tag.warn{color:var(--clay);font-weight:600;font-style:normal;}
+  .meta-controls{display:flex;align-items:center;gap:6px;margin-left:auto;}
+  .reorder-btn{
+    flex:none;background:none;border:none;color:var(--ink-faint);
+    width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0;
+  }
+  .reorder-btn svg{width:11px;height:11px;}
+  .reorder-btn:hover:not(:disabled){color:var(--ink-soft);}
+  .reorder-btn:disabled{opacity:.25;}
   .move-select{
     flex:none;font-size:10.5px;color:var(--ink-soft);background:var(--paper);
     border:1px solid var(--card-line);border-radius:var(--radius-pill);
-    padding:3px 5px;max-width:84px;cursor:pointer;
+    padding:3px 5px;max-width:88px;cursor:pointer;
   }
   .move-select:hover{border-color:var(--ink-faint);}
   .row-del{
-    flex:none;background:none;border:none;color:var(--ink-faint);opacity:0;
+    flex:none;background:none;border:none;color:var(--ink-faint);
     width:22px;height:22px;display:flex;align-items:center;justify-content:center;
-    transition:opacity .12s;
   }
-  .list-row:hover .row-del{opacity:1;}
   .row-del svg{width:14px;height:14px;}
   .row-del:hover{color:var(--clay);}
   .add-row{
@@ -560,7 +570,9 @@ const ICONS = {
   calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="15" rx="1.6"/><path d="M8 3.5v3.4M16 3.5v3.4M3.5 10h17"/></svg>',
   chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5V4.5M4.5 19.5h15"/><rect x="7" y="12" width="3" height="5.2"/><rect x="12" y="8.5" width="3" height="8.7"/><rect x="17" y="14.5" width="3" height="3.2"/></svg>',
   alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M12 8v5"/><circle cx="12" cy="15.8" r=".9" fill="currentColor" stroke="none"/></svg>',
-  spark: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3l1.8 6.2L20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8Z"/></svg>'
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3l1.8 6.2L20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8Z"/></svg>',
+  chevUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 15.5l6.5-6.5 6.5 6.5"/></svg>',
+  chevDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 8.5l6.5 6.5 6.5-6.5"/></svg>'
 };
 
 /* Hábitos de fábrica: se copian a cfg.habits la primera vez que se usa la app.
@@ -1279,16 +1291,25 @@ const KIND_LABELS = {priority:'Prioridad', goal:'Meta', task:'Tarea'};
 function renderChecklist(items, kind){
   if(!items.length) return `<div class="empty-hint">Todavía no hay nada aquí.</div>`;
   const otherKinds = Object.keys(KIND_TO_LISTKEY).filter(k => k !== kind);
+  const lastIdx = items.length - 1;
   return items.map((it,i)=>`
     <div class="list-row" data-done="${!!it.done}">
-      <button class="check-box" data-action="toggle-${kind}" data-index="${i}" data-done="${!!it.done}" aria-label="Marcar como hecho">${ICONS.check}</button>
-      <input type="text" data-field="${kind}Text" data-index="${i}" value="${escAttr(it.text)}">
-      ${it.carried ? `<span class="carried-tag${it.carriedDays >= 3 ? ' warn' : ''}">hace ${it.carriedDays} día${it.carriedDays > 1 ? 's' : ''}</span>` : ''}
-      <select class="move-select" data-move-kind="${kind}" data-index="${i}" aria-label="Mover a otra lista">
-        <option value="">Mover…</option>
-        ${otherKinds.map(k => `<option value="${k}">→ ${KIND_LABELS[k]}</option>`).join('')}
-      </select>
-      <button class="row-del" data-action="del-${kind}" data-index="${i}" aria-label="Eliminar">${ICONS.trash}</button>
+      <div class="list-row-main">
+        <button class="check-box" data-action="toggle-${kind}" data-index="${i}" data-done="${!!it.done}" aria-label="Marcar como hecho">${ICONS.check}</button>
+        <input type="text" data-field="${kind}Text" data-index="${i}" value="${escAttr(it.text)}">
+        <button class="row-del" data-action="del-${kind}" data-index="${i}" aria-label="Eliminar">${ICONS.trash}</button>
+      </div>
+      <div class="list-row-meta">
+        ${it.carried ? `<span class="carried-tag${it.carriedDays >= 3 ? ' warn' : ''}">hace ${it.carriedDays} día${it.carriedDays > 1 ? 's' : ''}</span>` : ''}
+        <span class="meta-controls">
+          <button class="reorder-btn" data-action="move-up" data-kind="${kind}" data-index="${i}" ${i===0 ? 'disabled' : ''} aria-label="Subir">${ICONS.chevUp}</button>
+          <button class="reorder-btn" data-action="move-down" data-kind="${kind}" data-index="${i}" ${i===lastIdx ? 'disabled' : ''} aria-label="Bajar">${ICONS.chevDown}</button>
+          <select class="move-select" data-move-kind="${kind}" data-index="${i}" aria-label="Mover a otra lista">
+            <option value="">Mover a…</option>
+            ${otherKinds.map(k => `<option value="${k}">→ ${KIND_LABELS[k]}</option>`).join('')}
+          </select>
+        </span>
+      </div>
     </div>
   `).join('');
 }
@@ -1480,6 +1501,9 @@ app.addEventListener('click', (e)=>{
     case 'del-task': delItem('tasks', btn); break;
     case 'del-priority': delItem('priorities', btn); break;
 
+    case 'move-up': reorderItem(KIND_TO_LISTKEY[btn.dataset.kind], parseInt(btn.dataset.index,10), -1); break;
+    case 'move-down': reorderItem(KIND_TO_LISTKEY[btn.dataset.kind], parseInt(btn.dataset.index,10), 1); break;
+
     case 'count-anger': {
       entry.anger.count += 1;
       const pool = (cfg.angerPhrases && cfg.angerPhrases.length) ? cfg.angerPhrases : DEFAULT_ANGER_PHRASES;
@@ -1566,6 +1590,14 @@ function addGratitudePhrase(inputEl){
   if(!val) return;
   cfg.gratitudePhrases.push(val);
   inputEl.value = '';
+  scheduleSave(); render();
+}
+function reorderItem(listKey, idx, direction){
+  const entry = getEntry(currentDate);
+  const arr = entry[listKey];
+  const newIdx = idx + direction;
+  if(!arr || isNaN(idx) || newIdx < 0 || newIdx >= arr.length) return;
+  [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
   scheduleSave(); render();
 }
 function moveItem(sourceKind, targetKind, idx){
