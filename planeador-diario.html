@@ -287,6 +287,12 @@
     white-space:nowrap;margin-right:2px;
   }
   .carried-tag.warn{color:var(--clay);font-weight:600;font-style:normal;}
+  .move-select{
+    flex:none;font-size:10.5px;color:var(--ink-soft);background:var(--paper);
+    border:1px solid var(--card-line);border-radius:var(--radius-pill);
+    padding:3px 5px;max-width:84px;cursor:pointer;
+  }
+  .move-select:hover{border-color:var(--ink-faint);}
   .row-del{
     flex:none;background:none;border:none;color:var(--ink-faint);opacity:0;
     width:22px;height:22px;display:flex;align-items:center;justify-content:center;
@@ -1265,13 +1271,23 @@ function renderBackupBanner(){
     </div>`;
 }
 
+/* Prioridades, Metas y Tareas comparten la misma forma de lista; estos mapeos permiten
+   mover un item de una a otra conservando su estado (hecho / días arrastrado). */
+const KIND_TO_LISTKEY = {priority:'priorities', goal:'goals', task:'tasks'};
+const KIND_LABELS = {priority:'Prioridad', goal:'Meta', task:'Tarea'};
+
 function renderChecklist(items, kind){
   if(!items.length) return `<div class="empty-hint">Todavía no hay nada aquí.</div>`;
+  const otherKinds = Object.keys(KIND_TO_LISTKEY).filter(k => k !== kind);
   return items.map((it,i)=>`
     <div class="list-row" data-done="${!!it.done}">
       <button class="check-box" data-action="toggle-${kind}" data-index="${i}" data-done="${!!it.done}" aria-label="Marcar como hecho">${ICONS.check}</button>
       <input type="text" data-field="${kind}Text" data-index="${i}" value="${escAttr(it.text)}">
       ${it.carried ? `<span class="carried-tag${it.carriedDays >= 3 ? ' warn' : ''}">hace ${it.carriedDays} día${it.carriedDays > 1 ? 's' : ''}</span>` : ''}
+      <select class="move-select" data-move-kind="${kind}" data-index="${i}" aria-label="Mover a otra lista">
+        <option value="">Mover…</option>
+        ${otherKinds.map(k => `<option value="${k}">→ ${KIND_LABELS[k]}</option>`).join('')}
+      </select>
       <button class="row-del" data-action="del-${kind}" data-index="${i}" aria-label="Eliminar">${ICONS.trash}</button>
     </div>
   `).join('');
@@ -1326,6 +1342,14 @@ app.addEventListener('keydown', (e)=>{
     if(kind === 'anxiety-phrase') addBankPhrase('anxietyPhrases', e.target);
     if(kind === 'habit') addHabit(e.target);
   }
+});
+
+app.addEventListener('change', (e)=>{
+  const sel = e.target.closest('select.move-select');
+  if(!sel) return;
+  const targetKind = sel.value;
+  if(!targetKind) return;
+  moveItem(sel.dataset.moveKind, targetKind, parseInt(sel.dataset.index,10));
 });
 
 app.addEventListener('click', (e)=>{
@@ -1542,6 +1566,15 @@ function addGratitudePhrase(inputEl){
   if(!val) return;
   cfg.gratitudePhrases.push(val);
   inputEl.value = '';
+  scheduleSave(); render();
+}
+function moveItem(sourceKind, targetKind, idx){
+  const entry = getEntry(currentDate);
+  const sourceListKey = KIND_TO_LISTKEY[sourceKind];
+  const targetListKey = KIND_TO_LISTKEY[targetKind];
+  if(!sourceListKey || !targetListKey || isNaN(idx)) return;
+  const [item] = entry[sourceListKey].splice(idx, 1);
+  if(item) entry[targetListKey].push(item);
   scheduleSave(); render();
 }
 function toggleItem(listKey, btn){
