@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi mejor versión — un día a la vez</title>
+<style>
+  :root{
+    --paper: #EAE3D2;
+    --paper-deep: #DFD6BF;
+    --card: #F4EFE2;
+    --card-line: #CBC0A3;
+    --ink: #2B2621;
+    --ink-soft: #6E6250;
+    --ink-faint: #9A8E78;
+    --teal: #2F5D55;
+    --teal-soft: #DCE7E1;
+    --ochre: #A9741F;
+    --ochre-soft: #F1E3C4;
+    --blue: #46647C;
+    --blue-soft: #DDE6EC;
+    --clay: #9C5340;
+    --clay-soft: #EFDAD2;
+    --radius-card: 3px;
+    --radius-pill: 999px;
+    --stack-gap: 20px;
+    --shadow-card: 0 1px 0 rgba(43,38,33,0.06), 0 8px 18px -14px rgba(43,38,33,0.35);
+    --font-display: "Iowan Old Style","Palatino Linotype","Book Antiqua", Georgia, "Times New Roman", serif;
+    --font-body: "Avenir Next","Century Gothic","Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.35), transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    min-height:100vh;
+    padding:28px 16px 80px;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  a,button,input,textarea{font-family:inherit;color:inherit;}
+  button{cursor:pointer;}
+  :focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+
+  /* ---------- Header ---------- */
+  .top-row{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:16px;flex-wrap:wrap;margin-bottom:18px;
+  }
+
+  .brand{display:flex;flex-direction:column;gap:1px;}
+  .brand-mark{
+    font-family:var(--font-display);font-style:italic;font-size:20px;
+    color:var(--ink);
+  }
+  .brand-sub{
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);
+  }
+
+  .util-btns{display:flex;gap:8px;}
+  .icon-btn{
+    display:flex;align-items:center;gap:6px;
+    background:transparent;border:1px solid var(--card-line);
+    border-radius:var(--radius-pill);padding:7px 12px;
+    font-size:12.5px;color:var(--ink-soft);
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .icon-btn:hover{background:var(--card);border-color:var(--ink-faint);color:var(--ink);}
+  .icon-btn svg{width:14px;height:14px;flex:none;}
+
+  header.hero{
+    display:grid;grid-template-columns: 1fr auto;gap:22px;align-items:end;
+    padding-bottom:16px;border-bottom:2px solid var(--ink);
+    margin-bottom:var(--stack-gap);
+  }
+
+  .date-nav{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .nav-arrow{
+    background:none;border:1px solid var(--card-line);border-radius:var(--radius-pill);
+    width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  }
+  .nav-arrow:hover{background:var(--card);}
+  .nav-arrow svg{width:14px;height:14px;}
+  .today-pill{
+    background:none;border:1px dashed var(--ink-faint);border-radius:var(--radius-pill);
+    padding:4px 12px;font-size:12px;color:var(--ink-soft);
+  }
+  .today-pill:hover{background:var(--card);}
+
+  .date-big{font-family:var(--font-display);font-weight:400;line-height:.95;}
+  .date-big .dow{
+    display:block;font-size:15px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--clay);margin-bottom:6px;font-family:var(--font-body);font-weight:600;
+  }
+  .date-big .num{font-size:clamp(48px,8vw,74px);}
+  .date-big .rest{font-size:17px;color:var(--ink-soft);margin-left:8px;}
+
+  .weather-block{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .weather-label{font-size:11.5px;letter-spacing:.1em;color:var(--ink-faint);}
+  .weather-picker{display:flex;gap:6px;}
+  .weather-btn{
+    width:42px;height:42px;border-radius:50%;border:1.5px solid var(--card-line);
+    background:var(--card);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s, border-color .15s, background .15s, color .15s;
+    color:var(--ink-soft);
+  }
+  .weather-btn svg{width:20px;height:20px;}
+  .weather-btn:hover{transform:translateY(-2px);}
+  .weather-btn[data-active="true"][data-w="sol"]{background:var(--ochre-soft);border-color:var(--ochre);color:var(--ochre);}
+  .weather-btn[data-active="true"][data-w="nube"]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);}
+  .weather-btn[data-active="true"][data-w="lluvia"]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);}
+
+  .progress-note{font-size:11.5px;color:var(--ink-faint);margin-top:2px;text-align:right;}
+
+  /* ---------- Aviso de respaldo ---------- */
+  .backup-banner{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--ochre-soft);border:1px solid var(--ochre);border-radius:var(--radius-card);
+    padding:10px 14px;margin-bottom:var(--stack-gap);font-size:12.5px;color:var(--ink);
+  }
+  .backup-icon{flex:none;color:var(--ochre);display:flex;}
+  .backup-icon svg{width:16px;height:16px;}
+  .backup-banner .msg{flex:1;min-width:200px;}
+  .backup-banner .export-now{
+    flex:none;background:var(--ink);color:var(--paper);border:none;border-radius:var(--radius-pill);
+    padding:7px 13px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;
+  }
+  .backup-banner .export-now svg{width:12px;height:12px;}
+  .backup-banner .export-now:hover{background:var(--teal);}
+  .backup-banner .dismiss{
+    flex:none;background:none;border:none;color:var(--ink-soft);width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .backup-banner .dismiss svg{width:12px;height:12px;}
+  .backup-banner .dismiss:hover{color:var(--ink);}
+
+  /* ---------- Quote ribbon ---------- */
+  .quote-ribbon{
+    background:var(--card);border:1px solid var(--card-line);border-radius:var(--radius-card);
+    padding:16px 18px 12px;margin-bottom:var(--stack-gap);box-shadow:var(--shadow-card);
+  }
+  .quote-ribbon.grat-ribbon .quote-mark{color:var(--teal);}
+  .quote-top{display:flex;align-items:flex-start;gap:14px;}
+  .quote-mark{flex:none;color:var(--clay);margin-top:2px;}
+  .quote-mark svg{width:24px;height:24px;}
+  .quote-input{
+    flex:1;width:100%;border:none;background:transparent;font-family:var(--font-display);
+    font-size:17px;font-style:italic;color:var(--ink);min-width:0;
+    line-height:1.45;resize:none;overflow:hidden;padding:0;display:block;
+    white-space:pre-wrap;word-wrap:break-word;
+  }
+  .quote-input::placeholder{color:var(--ink-faint);font-style:italic;}
+  .quote-input[readonly]{cursor:default;}
+  .quote-input[readonly]:focus{outline:none;}
+  .quote-actions{display:flex;justify-content:flex-end;margin-top:8px;}
+  .shuffle-btn{
+    flex:none;background:none;border:1px solid var(--card-line);border-radius:var(--radius-pill);
+    padding:6px 12px;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;
+  }
+  .shuffle-btn:hover{background:var(--paper);}
+  .shuffle-btn svg{width:13px;height:13px;}
+
+  /* ---------- Grid ---------- */
+  .grid{display:grid;grid-template-columns: 320px 1fr;gap:var(--stack-gap);align-items:start;}
+  @media (max-width:880px){.grid{grid-template-columns:1fr;}}
+  /* En pantallas angostas la grilla se apila en dos filas; el gap de la grilla ya separa
+     una columna de otra, así que la última tarjeta de cada columna no debe sumar su propio
+     margen o el espacio se duplicaría. */
+  .col-left > .card:last-child,
+  .col-right > .card:last-child{margin-bottom:0;}
+
+  .card{
+    background:var(--card);border:1px solid var(--card-line);border-radius:var(--radius-card);
+    padding:18px 18px 16px;box-shadow:var(--shadow-card);margin-bottom:var(--stack-gap);
+  }
+  .card h2{
+    margin:0 0 14px;font-family:var(--font-display);font-weight:400;font-size:15px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2 svg{width:15px;height:15px;color:var(--clay);}
+  .card h2 .count{
+    margin-left:auto;font-family:var(--font-body);text-transform:none;letter-spacing:0;
+    font-size:14px;font-weight:700;color:var(--ink-soft);
+    background:var(--paper);border:1px solid var(--card-line);border-radius:var(--radius-pill);
+    padding:3px 11px;
+  }
+
+  /* ---------- Habits ---------- */
+  .habit-row{
+    display:flex;align-items:center;gap:12px;padding:9px 0;
+    border-bottom:1px solid var(--card-line);
+  }
+  .habit-row:last-child{border-bottom:none;}
+  .habit-icon{
+    flex:none;width:30px;height:30px;border-radius:50%;background:var(--paper);
+    display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+  }
+  .habit-icon svg{width:16px;height:16px;}
+  .habit-text{flex:1;min-width:0;}
+  .habit-text .label{font-size:13.5px;font-weight:600;}
+  .habit-text .hint{font-size:11px;color:var(--ink-faint);}
+  .habit-toggle{
+    flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--card-line);
+    background:transparent;display:flex;align-items:center;justify-content:center;color:transparent;
+    transition:all .15s;
+  }
+  .habit-toggle svg{width:14px;height:14px;}
+  .habit-toggle[data-done="true"]{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .habit-row[data-done="true"] .habit-icon{background:var(--teal-soft);color:var(--teal);}
+  .habit-row[data-done="true"] .label{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--ink-faint);}
+
+  /* ---------- Water ---------- */
+  .water-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .drop-btn{
+    width:34px;height:34px;border:none;background:none;color:var(--card-line);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .drop-btn svg{width:24px;height:24px;}
+  .drop-btn[data-filled="true"]{color:var(--blue);}
+  .water-caption{font-size:12.5px;color:var(--ink-soft);}
+  .water-caption b{color:var(--ink);}
+
+  /* ---------- Contadores (enojo / ansiedad) ---------- */
+  .counter-row{display:flex;align-items:center;gap:16px;}
+  .counter-display{display:flex;flex-direction:column;align-items:center;line-height:1;}
+  .counter-big{font-family:var(--font-display);font-size:46px;font-weight:400;}
+  .counter-caption{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-top:2px;}
+  .counter-display.anger .counter-big{color:var(--clay);}
+  .counter-display.anxiety .counter-big{color:var(--blue);}
+  .counter-btn{
+    flex:none;min-width:58px;padding:9px 0;border-radius:var(--radius-pill);
+    border:1.5px solid var(--card-line);background:var(--paper);font-size:14px;font-weight:700;
+    text-align:center;transition:transform .12s, background .12s;
+  }
+  .counter-btn:active{transform:scale(.94);}
+  .counter-btn.anger{border-color:var(--clay);color:var(--clay);}
+  .counter-btn.anger:hover{background:var(--clay-soft);}
+  .counter-btn.anxiety{border-color:var(--blue);color:var(--blue);}
+  .counter-btn.anxiety:hover{background:var(--blue-soft);}
+  .counter-reset{
+    background:none;border:none;color:var(--ink-faint);font-size:11.5px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:4px;padding:2px 0;margin-left:auto;
+  }
+  .counter-reset:hover{color:var(--ink-soft);}
+  .counter-reset svg{width:11px;height:11px;}
+  .counter-msg{
+    margin-top:12px;padding:10px 12px;background:var(--paper);border-left:3px solid var(--clay);
+    border-radius:2px;font-family:var(--font-display);font-style:italic;font-size:13.5px;color:var(--ink-soft);
+    line-height:1.4;
+  }
+  .counter-msg.anxiety{border-left-color:var(--blue);}
+
+  /* ---------- Ruled lines (priorities / gratitude / notes) ---------- */
+  .ruled-line{
+    display:flex;align-items:baseline;gap:10px;
+    border-bottom:1px solid var(--card-line);padding:9px 0;
+  }
+  .ruled-line .num{
+    flex:none;font-family:var(--font-display);font-size:15px;color:var(--clay);width:16px;
+  }
+  .ruled-line input{
+    flex:1;border:none;background:transparent;font-size:14.5px;min-width:0;padding:2px 0;
+  }
+  .ruled-line input::placeholder{color:var(--ink-faint);}
+
+  /* ---------- Lists (goals/tasks) ---------- */
+  .list-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--card-line);}
+  .list-row:last-child{border-bottom:none;}
+  .check-box{
+    flex:none;width:19px;height:19px;border:1.5px solid var(--ink-faint);border-radius:4px;
+    background:transparent;display:flex;align-items:center;justify-content:center;color:transparent;
+  }
+  .check-box svg{width:12px;height:12px;}
+  .check-box[data-done="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+  .list-row input[type=text]{
+    flex:1;border:none;background:transparent;font-size:14px;min-width:0;padding:3px 0;
+  }
+  .list-row[data-done="true"] input[type=text]{color:var(--ink-faint);text-decoration:line-through;}
+  .carried-tag{
+    flex:none;font-size:10px;font-style:italic;color:var(--ink-faint);
+    white-space:nowrap;margin-right:2px;
+  }
+  .carried-tag.warn{color:var(--clay);font-weight:600;font-style:normal;}
+  .row-del{
+    flex:none;background:none;border:none;color:var(--ink-faint);opacity:0;
+    width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+    transition:opacity .12s;
+  }
+  .list-row:hover .row-del{opacity:1;}
+  .row-del svg{width:14px;height:14px;}
+  .row-del:hover{color:var(--clay);}
+  .add-row{
+    display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:4px;
+  }
+  .add-row input{flex:1;border:none;border-bottom:1px dashed var(--card-line);background:transparent;
+    font-size:14px;padding:5px 0;min-width:0;}
+  .add-row input::placeholder{color:var(--ink-faint);}
+  .add-btn{
+    flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--ink-faint);
+    background:transparent;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+  }
+  .add-btn:hover{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .add-btn svg{width:13px;height:13px;}
+  .empty-hint{font-size:12.5px;color:var(--ink-faint);font-style:italic;padding:4px 0;}
+
+  /* ---------- Notes ---------- */
+  .notes-area{position:relative;}
+  .notes-area::before{
+    content:"";position:absolute;left:32px;top:0;bottom:0;width:1px;background:var(--clay-soft);
+  }
+  textarea.notes-input{
+    width:100%;min-height:170px;resize:vertical;border:none;background:
+      repeating-linear-gradient(var(--card), var(--card) 27px, var(--card-line) 28px);
+    background-position:0 2px;
+    font-size:14.5px;line-height:28px;padding:2px 12px 2px 46px;color:var(--ink);
+  }
+
+  footer.foot{
+    text-align:center;font-size:11.5px;color:var(--ink-faint);margin-top:8px;
+  }
+
+  input[type=file]{display:none;}
+
+  /* ---------- Configuración (modal) ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(43,38,33,0.42);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;
+  }
+  .modal-card{
+    background:var(--paper);border:1px solid var(--card-line);border-radius:var(--radius-card);
+    width:100%;max-width:480px;max-height:85vh;overflow-y:auto;
+    box-shadow:0 20px 40px -12px rgba(43,38,33,0.5);
+  }
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;border-bottom:2px solid var(--ink);position:sticky;top:0;background:var(--paper);
+  }
+  .modal-head h3{margin:0;font-family:var(--font-display);font-weight:400;font-size:19px;}
+  .modal-close{
+    background:none;border:1px solid var(--card-line);border-radius:50%;
+    width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+  }
+  .modal-close svg{width:13px;height:13px;}
+  .modal-close:hover{background:var(--card);}
+  .modal-section{padding:18px 20px;border-bottom:1px solid var(--card-line);}
+  .modal-section:last-child{border-bottom:none;}
+  .modal-section h4{
+    margin:0 0 4px;font-family:var(--font-display);font-weight:400;font-size:14px;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);
+    display:flex;align-items:center;gap:7px;
+  }
+  .modal-section h4 svg{width:13px;height:13px;flex:none;color:var(--clay);}
+  .modal-hint{font-size:12px;color:var(--ink-faint);margin:0 0 12px;}
+  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .modal-actions .icon-btn{padding:9px 14px;font-size:13px;}
+  .quote-list-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--card-line);}
+  .quote-list-row:last-of-type{border-bottom:none;}
+  .habit-edit-row{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--card-line);}
+  .habit-edit-row:last-of-type{border-bottom:none;}
+  .habit-edit-fields{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .habit-edit-fields input{
+    border:none;background:transparent;font-family:var(--font-body);padding:2px 0;min-width:0;
+  }
+  .habit-edit-fields input:first-child{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .habit-edit-fields input:last-child{font-size:12px;color:var(--ink-soft);}
+  .water-goal-field{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .water-goal-field input[type=number]{
+    width:64px;text-align:center;border:1px solid var(--card-line);border-radius:var(--radius-pill);
+    padding:6px 8px;font-size:14px;background:var(--paper);color:var(--ink);
+  }
+  .quote-list-row textarea{
+    flex:1;border:none;background:transparent;font-size:13.5px;line-height:1.4;
+    min-width:0;resize:none;padding:2px 0;font-family:var(--font-body);
+  }
+
+  /* ---------- Calendario ---------- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-month-label{font-family:var(--font-display);font-size:15px;text-transform:capitalize;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .cal-weekday{
+    font-size:10px;text-align:center;color:var(--ink-faint);letter-spacing:.05em;
+    text-transform:uppercase;padding-bottom:6px;
+  }
+  .cal-day{
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;border:1px solid transparent;background:none;font-size:13px;color:var(--ink);
+    position:relative;min-width:0;
+  }
+  .cal-day:hover{background:var(--paper);}
+  .cal-day.cal-today{border-color:var(--ink-faint);}
+  .cal-day.cal-selected{background:var(--ink);color:var(--card);}
+  .cal-day.cal-pending::after{
+    content:"";position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+    width:5px;height:5px;border-radius:50%;background:var(--clay);
+  }
+  .cal-day.cal-selected.cal-pending::after{background:var(--clay-soft);}
+  .cal-day.cal-empty{visibility:hidden;pointer-events:none;}
+  .cal-legend-dot{
+    display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--clay);margin-right:5px;
+  }
+
+  /* ---------- Estadísticas ---------- */
+  .stats-period-toggle{display:flex;gap:8px;}
+  .period-btn{
+    padding:7px 14px;border-radius:var(--radius-pill);border:1px solid var(--card-line);
+    background:var(--paper);font-size:12.5px;color:var(--ink-soft);
+  }
+  .period-btn[data-active="true"]{background:var(--ink);color:var(--card);border-color:var(--ink);}
+  .chart-legend{display:flex;gap:18px;margin-top:10px;font-size:12px;color:var(--ink-soft);}
+  .chart-legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;}
+  .chart-legend .dot.anger{background:var(--clay);}
+  .chart-legend .dot.anxiety{background:var(--blue);}
+  .streak-badge{
+    flex:none;font-size:11.5px;font-weight:700;color:var(--teal);background:var(--teal-soft);
+    border-radius:var(--radius-pill);padding:4px 10px;white-space:nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<input type="file" id="importInput" accept="application/json">
+
+<script>
+/* ============================= Datos base ============================= */
+const STORAGE_CFG = 'planner_cfg';
+const STORAGE_HIST = 'planner_hist';
+const EXPORT_REMINDER_DAYS = 10;
+
+/* Banco de reserva: solo se usa si el usuario borra todas sus frases configuradas */
+const DEFAULT_QUOTES = [
+  "El día se construye una decisión pequeña a la vez.",
+  "No necesitas ver toda la escalera, solo el siguiente escalón.",
+  "Hazlo simple, hazlo hoy.",
+  "La constancia vence a la intensidad.",
+  "Un paso ordinario, repetido, es lo extraordinario.",
+  "Primero lo importante, luego lo urgente.",
+  "El descanso también es parte del plan.",
+  "Agradece lo pequeño; ahí vive lo grande.",
+  "Hoy no tiene que ser perfecto, solo tiene que empezar.",
+  "Cuida tu atención como cuidas tu tiempo.",
+  "Lo que se anota, se recuerda; lo que se recuerda, se cumple.",
+  "Una tarea a la vez es un plan; todas a la vez es ruido.",
+  "El progreso no siempre se ve, pero se acumula.",
+  "Elige tres cosas y hazlas bien.",
+  "La calma también avanza."
+];
+
+/* Frases configuradas por el usuario (se guardan en cfg.quotes y se pueden editar en Configuración) */
+const INITIAL_USER_QUOTES = [
+  "La obsesión vence al talento siempre.",
+  "Sin esforzarte nunca vas a ser grande.",
+  "Preocúpese por lo que tiene en la cabeza, esa es la verdadera riqueza.",
+  "Yo construí todo esto… Yo, ladrillo por ladrillo.",
+  "Perder? Yo no pierdo! Yo gano, ese es mi trabajo, eso es lo que hago.",
+  "Tengo que pensar que yo soy el mejor de todos, el campeón más brutal, salvaje y despiadado que ha existido.",
+  "No hay ningún mañana! No hay ningún mañana!",
+  "Nunca me rendiré, jamás!",
+  "Eso lo hacen los cobardes. Y tú no eres un cobarde. ¡Tú eres mejor que eso!",
+  "No veo resultados, sigue adelante.",
+  "Todos avanzan más que yo, sigue adelante.",
+  "Estoy cansado, sigue adelante.",
+  "Siento que no lo lograré, sigue adelante.",
+  "Soy el único responsable de lograrlo, por eso nunca dejaré de seguir adelante.",
+  "Tu proceso será único, no tienes por qué compararlo con el de los demás.",
+  "Dedícale tus logros a la versión tuya que no imaginaba que podrías iniciar."
+];
+
+/* Banco de reserva para agradecimiento */
+const DEFAULT_GRATITUDE = [
+  "Agradece algo pequeño de hoy; ahí también vive lo grande.",
+  "Agradece un momento de calma en medio del día.",
+  "Agradece a alguien que te acompañó hoy, aunque fuera un instante."
+];
+
+/* Frases para el registro de enojo y ansiedad (configurables en Configuración) */
+const DEFAULT_ANGER_PHRASES = ["Respira antes de reaccionar; la calma también es una decisión."];
+const INITIAL_USER_ANGER_PHRASES = ["No reacciones. Primero calma, después decides."];
+
+const DEFAULT_ANXIETY_PHRASES = ["Estás bien. Este momento va a pasar."];
+const INITIAL_USER_ANXIETY_PHRASES = ["Respira. Suelta la tensión. No tienes que actuar ahora."];
+
+/* Frases de agradecimiento configuradas por el usuario */
+const INITIAL_USER_GRATITUDE = [
+  "Agradezco tener a Natalia; nuestra historia pudo terminar, pero la vida nos dio otra oportunidad.",
+  "Agradezco a Jerónimo; su existencia convirtió mi vida en algo mucho más grande que yo.",
+  "Agradezco poder ver crecer a mi hijo; estos días no volverán.",
+  "Agradezco tener a mis papás; algún día entenderé aún más el valor de tenerlos conmigo.",
+  "Agradezco a mi mamá por todo lo que ha hecho por mí, incluso aquello que nunca llegué a comprender.",
+  "Agradezco a mi papá por todo lo que me enseñó, incluso aquello que aprendí con el tiempo.",
+  "Agradezco que mis papás todavía puedan compartir conmigo esta etapa de mi vida.",
+  "Agradezco tener una familia a la que puedo volver después de un día difícil.",
+  "Agradezco las segundas oportunidades; no todos los errores tienen una segunda oportunidad.",
+  "Agradezco estar viviendo cosas que alguna vez solamente imaginé.",
+  "Agradezco los días normales; algún día descubriré que también eran días especiales.",
+  "Agradezco poder abrazar hoy a quienes amo; mañana nunca está garantizado.",
+  "Agradezco haber superado días que alguna vez pensé que no podría superar.",
+  "Agradezco mis errores; me enseñaron lo que no quiero volver a ser.",
+  "Agradezco poder cambiar antes de perder aquello que amo.",
+  "Agradezco tener la oportunidad de ser un mejor hombre, pareja y papá.",
+  "Agradezco poder detenerme antes de reaccionar; estoy aprendiendo a no dejar que mi carácter decida por mí.",
+  "Agradezco tener personas que me aman incluso cuando todavía estoy aprendiendo a mejorar.",
+  "Agradezco mi hogar; no necesito que sea perfecto para reconocer lo valioso que es.",
+  "Agradezco tener salud, porque muchas veces solo entendemos su valor cuando nos falta.",
+  "Agradezco tener trabajo y la oportunidad de seguir construyendo mi futuro.",
+  "Agradezco lo que tengo hoy, porque sé que pudo no haber sido así.",
+  "Agradezco a Dios no solo por lo que me ha dado, sino también por aquello de lo que me ha protegido.",
+  "Agradezco lo que perdí, porque algunas pérdidas me enseñaron a valorar lo que permanece.",
+  "Agradezco poder decir \u201cte amo\u201d mientras todavía tengo a quién decírselo.",
+  "Agradezco que mi historia todavía tenga páginas por escribir.",
+  "Agradezco no tener una vida perfecta; tengo una vida que vale la pena cuidar.",
+  "Agradezco despertar cada día con una nueva oportunidad de hacerlo mejor.",
+  "Agradezco tener motivos para luchar, personas que amar y un futuro que construir.",
+  "Agradezco estar aquí. Después de todo lo vivido, estar aquí ya es motivo suficiente."
+];
+
+const ICONS = {
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>',
+  cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 18.5h10.4a3.7 3.7 0 0 0 .5-7.36 5.2 5.2 0 0 0-9.86-2A4.3 4.3 0 0 0 6.8 18.5Z"/></svg>',
+  rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 14.5h10.4a3.7 3.7 0 0 0 .5-7.36 5.2 5.2 0 0 0-9.86-2A4.3 4.3 0 0 0 6.8 14.5Z"/><path d="M8.5 18.5l-1 2.2M12.3 18.5l-1 2.2M16.1 18.5l-1 2.2"/></svg>',
+  thanks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.2l1.3 2.9 3.1.4-2.3 2.2.6 3.1L12 11.3 9.3 12.8l.6-3.1-2.3-2.2 3.1-.4Z"/><path d="M5 18.5l1.3-2.1M19 18.5l-1.3-2.1M12 16.3v3.5"/></svg>',
+  meditate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.3" r="1.7"/><path d="M4 17.5c1.8-2.4 4.4-3.7 8-3.7s6.2 1.3 8 3.7M8 13.8c.6-1.7 1.9-2.7 4-2.7s3.4 1 4 2.7"/><path d="M3.4 19.6h17.2"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.2c-1.6-1.1-3.6-1.6-6-1.6v13.4c2.4 0 4.4.5 6 1.6 1.6-1.1 3.6-1.6 6-1.6V4.6c-2.4 0-4.4.5-6 1.6Z"/><path d="M12 6.2v13.4"/></svg>',
+  dumbbell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 9.4v5.2M4 10.4v3.2M17.8 9.4v5.2M20 10.4v3.2M8.4 12h7.2"/></svg>',
+  film: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4.5 8.2l1.6-3.4h13.8l-1.6 3.4Zm0 0h15.8v9.6a1.2 1.2 0 0 1-1.2 1.2H5.7a1.2 1.2 0 0 1-1.2-1.2Z"/><path d="M9 4.8L7.4 8.2M15 4.8l-1.6 3.4"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7.3" y="3.2" width="9.4" height="17.6" rx="1.8"/><path d="M10.6 17.6h2.8M3.6 3.6l16.8 16.8"/></svg>',
+  drop: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.4s5.6 6.3 5.6 10.4a5.6 5.6 0 1 1-11.2 0C6.4 9.7 12 3.4 12 3.4Z"/></svg>',
+  quote: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4.5 8.4c0-2.6 1.7-4.4 4.4-4.9l.5 1.5c-1.7.5-2.5 1.4-2.6 2.7.4-.2.9-.3 1.3-.3 1.4 0 2.4 1 2.4 2.4S9.5 12.3 8 12.3c-2 0-3.5-1.5-3.5-3.9Zm9.4 0c0-2.6 1.7-4.4 4.4-4.9l.5 1.5c-1.7.5-2.5 1.4-2.6 2.7.4-.2.9-.3 1.3-.3 1.4 0 2.4 1 2.4 2.4s-1.1 2.5-2.6 2.5c-2 0-3.4-1.5-3.4-3.9Z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l4.5 4.5 10.5-11"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4.5v15M4.5 12h15"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6.5h14M9.5 6.5V4.8a1.2 1.2 0 0 1 1.2-1.2h2.6a1.2 1.2 0 0 1 1.2 1.2v1.7M7.2 6.5l.7 12a1.6 1.6 0 0 0 1.6 1.5h5a1.6 1.6 0 0 0 1.6-1.5l.7-12"/></svg>',
+  chevL: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5l-6.5 6.5 6.5 6.5"/></svg>',
+  chevR: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5.5l6.5 6.5-6.5 6.5"/></svg>',
+  shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h3.4L14 17.5h3.6M4 17.5h3.4l1.7-2.9M14.5 6.5h3.1M17.6 6.5l-2 2.2M17.6 6.5l-2-2.2M17.6 17.5l-2 2.2M17.6 17.5l-2-2.2"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6v11.3M7.6 11.2l4.4 4.4 4.4-4.4M4.5 17.4v1.8a1.2 1.2 0 0 0 1.2 1.2h12.6a1.2 1.2 0 0 0 1.2-1.2v-1.8"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.9V4.6M16.4 8.4 12 4l-4.4 4.4M4.5 17.4v1.8a1.2 1.2 0 0 0 1.2 1.2h12.6a1.2 1.2 0 0 0 1.2-1.2v-1.8"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="7.6"/><circle cx="12" cy="12" r="4.1"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 6.5h10.5M9 12h10.5M9 17.5h10.5M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"/><path d="M19.4 13.6a1.6 1.6 0 0 0 .32 1.77l.06.06a1.95 1.95 0 1 1-2.76 2.76l-.06-.06a1.6 1.6 0 0 0-1.77-.32 1.6 1.6 0 0 0-.97 1.47v.17a1.95 1.95 0 1 1-3.9 0v-.09a1.6 1.6 0 0 0-1.05-1.47 1.6 1.6 0 0 0-1.77.32l-.06.06a1.95 1.95 0 1 1-2.76-2.76l.06-.06a1.6 1.6 0 0 0 .32-1.77 1.6 1.6 0 0 0-1.47-.97h-.17a1.95 1.95 0 1 1 0-3.9h.09a1.6 1.6 0 0 0 1.47-1.05 1.6 1.6 0 0 0-.32-1.77l-.06-.06A1.95 1.95 0 1 1 7.36 4.2l.06.06a1.6 1.6 0 0 0 1.77.32h.08a1.6 1.6 0 0 0 .97-1.47V3a1.95 1.95 0 1 1 3.9 0v.09a1.6 1.6 0 0 0 .97 1.47h.08a1.6 1.6 0 0 0 1.77-.32l.06-.06a1.95 1.95 0 1 1 2.76 2.76l-.06.06a1.6 1.6 0 0 0-.32 1.77v.08a1.6 1.6 0 0 0 1.47.97H21a1.95 1.95 0 1 1 0 3.9h-.09a1.6 1.6 0 0 0-1.47.97Z"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c1 2.4-.3 3.6-1.4 4.8-1.3 1.4-2.4 2.7-2.4 4.7a4.8 4.8 0 0 0 9.6 0c0-2-.9-3-1.8-4-.3 1.6-1 2.2-1.7 2.2-1 0-1.4-1-.9-2.1.6-1.4.6-3-1.4-5.6Z"/></svg>',
+  breeze: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9c1.6-1.6 3.2-1.6 4.8 0s3.2 1.6 4.8 0 3.2-1.6 4.8 0M3.5 14.5c1.6-1.6 3.2-1.6 4.8 0s3.2 1.6 4.8 0 3.2-1.6 4.8 0"/></svg>',
+  reset: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 1 2.2 5.3"/><path d="M4.3 16.8V13h3.8"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="15" rx="1.6"/><path d="M8 3.5v3.4M16 3.5v3.4M3.5 10h17"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5V4.5M4.5 19.5h15"/><rect x="7" y="12" width="3" height="5.2"/><rect x="12" y="8.5" width="3" height="8.7"/><rect x="17" y="14.5" width="3" height="3.2"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M12 8v5"/><circle cx="12" cy="15.8" r=".9" fill="currentColor" stroke="none"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3l1.8 6.2L20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8Z"/></svg>'
+};
+
+/* Hábitos de fábrica: se copian a cfg.habits la primera vez que se usa la app.
+   Desde ahí, el usuario puede editarlos, borrarlos o agregar los suyos desde Configuración. */
+const HABIT_DEFAULTS = [
+  {key:'gracias', label:'Dar gracias', hint:'Un momento de agradecimiento consciente'},
+  {key:'meditacion', label:'Meditación', hint:'Aunque sean cinco minutos'},
+  {key:'lectura', label:'Leer', hint:'Unas páginas cuentan'},
+  {key:'ejercicio', label:'Ejercicio', hint:'Mover el cuerpo, aunque sea poco'},
+  {key:'entretenimiento', label:'Entretenimiento', hint:'Tiempo libre con intención'},
+  {key:'celular', label:'Uso limitado del celular', hint:'Menos pantalla, más presencia'}
+];
+
+/* Iconos fijos para los hábitos de fábrica; cualquier hábito nuevo que agregue el usuario
+   usa un icono genérico (chispa) ya que no tiene un dibujo propio. */
+const HABIT_ICON_MAP = {
+  gracias: ICONS.thanks, meditacion: ICONS.meditate, lectura: ICONS.book,
+  ejercicio: ICONS.dumbbell, entretenimiento: ICONS.film, celular: ICONS.phone
+};
+function habitIcon(key){ return HABIT_ICON_MAP[key] || ICONS.spark; }
+
+/* ============================= Estado ============================= */
+let cfg = null;
+let hist = null;
+let currentDate = todayStr();
+let saveTimer = null;
+let settingsOpen = false;
+let calendarOpen = false;
+let calendarYear = null;
+let calendarMonth = null; // 0-indexed
+let statsOpen = false;
+let statsPeriod = 7; // 7 o 30 días
+
+function todayStr(d){
+  const dt = d ? new Date(d) : new Date();
+  const y = dt.getFullYear(), m = String(dt.getMonth()+1).padStart(2,'0'), day = String(dt.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function defaultEntry(dateStr){
+  const quotePool = (cfg && cfg.quotes && cfg.quotes.length) ? cfg.quotes : DEFAULT_QUOTES;
+  const gratPool = (cfg && cfg.gratitudePhrases && cfg.gratitudePhrases.length) ? cfg.gratitudePhrases : DEFAULT_GRATITUDE;
+  return {
+    date: dateStr,
+    weather: null,
+    quote: pickDaily(dateStr, 'quote', quotePool),
+    gratitudeText: pickDaily(dateStr, 'gratitude', gratPool),
+    priorities: [],
+    goals: [],
+    tasks: [],
+    notes: '',
+    water: 0,
+    anger: { count: 0, lastMessage: '' },
+    anxiety: { count: 0, lastMessage: '' },
+    habits: Object.fromEntries(
+      ((cfg && Array.isArray(cfg.habits)) ? cfg.habits : HABIT_DEFAULTS).map(h => [h.key, false])
+    )
+  };
+}
+
+function loadState(){
+  try{
+    cfg = JSON.parse(localStorage.getItem(STORAGE_CFG)) || {};
+  }catch(e){ cfg = {}; }
+  try{
+    hist = JSON.parse(localStorage.getItem(STORAGE_HIST)) || {};
+  }catch(e){ hist = {}; }
+  if(typeof cfg.waterGoal !== 'number') cfg.waterGoal = 8;
+  if(!Array.isArray(cfg.quotes)) cfg.quotes = INITIAL_USER_QUOTES.slice();
+  if(!Array.isArray(cfg.gratitudePhrases)) cfg.gratitudePhrases = INITIAL_USER_GRATITUDE.slice();
+  if(!Array.isArray(cfg.angerPhrases)) cfg.angerPhrases = INITIAL_USER_ANGER_PHRASES.slice();
+  if(!Array.isArray(cfg.anxietyPhrases)) cfg.anxietyPhrases = INITIAL_USER_ANXIETY_PHRASES.slice();
+  if(!cfg.firstUseDate) cfg.firstUseDate = todayStr();
+  if(!Array.isArray(cfg.habits)) cfg.habits = HABIT_DEFAULTS.map(h => ({...h}));
+}
+
+/* Días transcurridos desde el último respaldo exportado (o desde el primer uso si nunca se ha exportado) */
+function daysSinceExport(){
+  const today = todayStr();
+  const base = cfg.lastExportDate || cfg.firstUseDate || today;
+  const a = new Date(base + 'T00:00:00');
+  const b = new Date(today + 'T00:00:00');
+  return Math.round((b - a) / 86400000);
+}
+
+/* Elige una frase al azar, evitando repetir la anterior si hay más de una disponible */
+function pickRandomDistinct(pool, current){
+  if(!pool || !pool.length) return '';
+  if(pool.length === 1) return pool[0];
+  let next = current;
+  while(next === current){ next = pool[Math.floor(Math.random()*pool.length)]; }
+  return next;
+}
+
+/* Elige una frase de forma distinta cada día, de manera predecible según la fecha */
+function dateHash(dateStr, salt){
+  const s = dateStr + '|' + salt;
+  let h = 0;
+  for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; }
+  return h;
+}
+function pickDaily(dateStr, salt, pool){
+  if(!pool || !pool.length) return '';
+  return pool[dateHash(dateStr, salt) % pool.length];
+}
+
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    localStorage.setItem(STORAGE_CFG, JSON.stringify(cfg));
+    localStorage.setItem(STORAGE_HIST, JSON.stringify(hist));
+  }, 250);
+}
+
+function getEntry(dateStr){
+  if(!hist[dateStr]) hist[dateStr] = defaultEntry(dateStr);
+  const e = hist[dateStr];
+  if(!e.habits) e.habits = {};
+  ((cfg && Array.isArray(cfg.habits)) ? cfg.habits : HABIT_DEFAULTS).forEach(h=>{
+    if(!(h.key in e.habits)) e.habits[h.key] = false;
+  });
+  if(!Array.isArray(e.priorities)){
+    e.priorities = [];
+  } else if(e.priorities.length && typeof e.priorities[0] === 'string'){
+    /* formato antiguo: 3 líneas de texto fijas -> lista dinámica de {text, done} */
+    e.priorities = e.priorities.filter(t => t && t.trim()).map(t => ({text:t, done:false}));
+  }
+  if(typeof e.gratitudeText !== 'string'){
+    const gratPool = (cfg && cfg.gratitudePhrases && cfg.gratitudePhrases.length) ? cfg.gratitudePhrases : DEFAULT_GRATITUDE;
+    e.gratitudeText = pickDaily(dateStr, 'gratitude', gratPool);
+  }
+  if(!Array.isArray(e.goals)) e.goals = [];
+  if(!Array.isArray(e.tasks)) e.tasks = [];
+  if(typeof e.water !== 'number') e.water = 0;
+  if(typeof e.notes !== 'string') e.notes = '';
+  if(!e.anger) e.anger = { count: 0, lastMessage: '' };
+  if(!e.anxiety) e.anxiety = { count: 0, lastMessage: '' };
+  return e;
+}
+
+/* ============================= Traslado automático de pendientes ============================= */
+/* Mueve prioridades, metas y tareas sin marcar, y notas sin vaciar, de "source" hacia "target".
+   Lo ya resuelto (hecho) se queda en su día original; solo viaja lo pendiente. */
+function migratePendingForward(source, target){
+  ['priorities','goals','tasks'].forEach(key=>{
+    const pending = source[key].filter(it => !it.done).map(it => ({
+      text: it.text, done:false, carried:true,
+      carriedDays: (it.carriedDays || 0) + 1
+    }));
+    const doneHere = source[key].filter(it => it.done);
+    source[key] = doneHere;
+    target[key] = pending.concat(target[key] || []);
+  });
+  if(source.notes && source.notes.trim()){
+    const carriedNotes = source.notes.trim();
+    target.notes = target.notes ? (carriedNotes + '\n\n' + target.notes) : carriedNotes;
+    source.notes = '';
+  }
+  source.migratedOut = true;
+}
+
+/* Se ejecuta una vez por cada día real distinto en que se abre la app: busca el último día
+   con pendientes sin trasladar y los mueve hacia el día de hoy. */
+function runDailyRollover(){
+  const today = todayStr();
+  if(cfg.lastRolloverDate === today) return;
+  const priorDates = Object.keys(hist).filter(d => d < today && !hist[d].migratedOut).sort();
+  if(priorDates.length){
+    const sourceDate = priorDates[priorDates.length - 1];
+    const source = getEntry(sourceDate);
+    const target = getEntry(today);
+    migratePendingForward(source, target);
+  }
+  cfg.lastRolloverDate = today;
+  scheduleSave();
+}
+
+/* ============================= Calendario ============================= */
+/* Revisa (sin crear entradas nuevas) si a esa fecha le quedaron prioridades, metas o tareas sin marcar */
+function hasPendingOnDate(dateStr){
+  const e = hist[dateStr];
+  if(!e) return false;
+  const pend = arr => Array.isArray(arr) && arr.some(it => !it.done);
+  return pend(e.priorities) || pend(e.goals) || pend(e.tasks);
+}
+
+const WEEKDAY_LABELS = ['L','M','X','J','V','S','D'];
+
+function buildCalendarCells(year, month){
+  const firstJsDay = new Date(year, month, 1).getDay(); // 0=domingo..6=sábado
+  const offset = (firstJsDay + 6) % 7; // convertir para que la semana inicie en lunes
+  const totalDays = new Date(year, month+1, 0).getDate();
+  const cells = [];
+  for(let i=0;i<offset;i++) cells.push(null);
+  for(let d=1; d<=totalDays; d++){
+    const y = year, m = String(month+1).padStart(2,'0'), day = String(d).padStart(2,'0');
+    cells.push(`${y}-${m}-${day}`);
+  }
+  return cells;
+}
+
+/* ============================= Estadísticas ============================= */
+/* Días consecutivos (terminando hoy) en que un hábito estuvo marcado */
+function habitStreak(key){
+  let count = 0;
+  let d = new Date(todayStr() + 'T00:00:00');
+  while(true){
+    const ds = todayStr(d);
+    const e = hist[ds];
+    if(e && e.habits && e.habits[key]){ count++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return count;
+}
+
+/* Últimos `n` días (incluyendo hoy), del más antiguo al más reciente */
+function lastNDates(n){
+  const out = [];
+  const base = new Date(todayStr() + 'T00:00:00');
+  for(let i = n-1; i>=0; i--){
+    const d = new Date(base);
+    d.setDate(d.getDate()-i);
+    out.push(todayStr(d));
+  }
+  return out;
+}
+
+/* Gráfico de barras agrupadas (enojo/ansiedad) construido a mano en SVG */
+function buildMoodChartSVG(days, angerVals, anxietyVals){
+  const n = days.length;
+  const groupW = n <= 7 ? 42 : (n <= 14 ? 26 : 13);
+  const barW = groupW * 0.34;
+  const gap = groupW * 0.1;
+  const chartH = 86;
+  const w = n * groupW + 16;
+  const maxVal = Math.max(1, ...angerVals, ...anxietyVals);
+  const baseline = chartH + 14;
+  let bars = '', labels = '';
+
+  days.forEach((d,i)=>{
+    const x = 8 + i*groupW;
+    const aH = (angerVals[i]/maxVal)*chartH;
+    const nH = (anxietyVals[i]/maxVal)*chartH;
+    bars += `<rect x="${x}" y="${baseline-aH}" width="${barW}" height="${Math.max(aH,angerVals[i]>0?2:0)}" rx="1.5" fill="#9C5340"></rect>`;
+    bars += `<rect x="${x+barW+gap}" y="${baseline-nH}" width="${barW}" height="${Math.max(nH,anxietyVals[i]>0?2:0)}" rx="1.5" fill="#46647C"></rect>`;
+    const showLabel = n <= 7 || i % Math.ceil(n/8) === 0;
+    if(showLabel){
+      const dt = new Date(d + 'T00:00:00');
+      const lbl = n <= 7
+        ? dt.toLocaleDateString('es-ES',{weekday:'short'}).charAt(0).toUpperCase()
+        : String(dt.getDate());
+      labels += `<text x="${x + barW + gap/2}" y="${baseline+12}" font-size="9" fill="#9A8E78" text-anchor="middle">${lbl}</text>`;
+    }
+  });
+
+  return `<svg viewBox="0 0 ${w} ${chartH+26}" style="width:100%;height:auto;display:block;">${bars}${labels}</svg>`;
+}
+
+/* ============================= Utilidades de fecha ============================= */
+function shiftDate(dateStr, days){
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return todayStr(d);
+}
+
+function longDate(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  const dow = d.toLocaleDateString('es-ES', {weekday:'long'});
+  const day = d.getDate();
+  const month = d.toLocaleDateString('es-ES', {month:'long'});
+  const year = d.getFullYear();
+  return {dow, day, month, year};
+}
+
+/* ============================= Render ============================= */
+function render(){
+  const entry = getEntry(currentDate);
+  const {dow, day, month, year} = longDate(currentDate);
+  const isToday = currentDate === todayStr();
+
+  const totalHabits = cfg.habits.length;
+  const doneHabits = cfg.habits.filter(h => entry.habits[h.key]).length;
+  const totalTasks = entry.tasks.length;
+  const doneTasks = entry.tasks.filter(t=>t.done).length;
+  const totalGoals = entry.goals.length;
+  const doneGoals = entry.goals.filter(g=>g.done).length;
+  const totalPriorities = entry.priorities.length;
+  const donePriorities = entry.priorities.filter(p=>p.done).length;
+  const waterDone = entry.water >= cfg.waterGoal ? 1 : 0;
+  const notesDone = entry.notes.trim() ? 0 : 1; // las notas cuentan como resueltas cuando ya las vaciaste a su lugar
+
+  const totalUnits = totalHabits + 1 /* agua */ + 1 /* notas */ + totalTasks + totalGoals + totalPriorities;
+  const doneUnits = doneHabits + waterDone + notesDone + doneTasks + doneGoals + donePriorities;
+  const pct = totalUnits ? Math.round((doneUnits/totalUnits)*100) : 0;
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="top-row">
+      <div class="brand">
+        <span class="brand-mark">Mi mejor versión</span>
+        <span class="brand-sub">un día a la vez</span>
+      </div>
+      <div class="util-btns">
+        <button class="icon-btn" data-action="open-stats">${ICONS.chart} Estadísticas</button>
+        <button class="icon-btn" data-action="open-settings">${ICONS.gear} Configuración</button>
+      </div>
+    </div>
+
+    ${renderBackupBanner()}
+
+    <header class="hero">
+      <div>
+        <div class="date-nav">
+          <button class="nav-arrow" data-action="prev-day" aria-label="Día anterior">${ICONS.chevL}</button>
+          <button class="nav-arrow" data-action="next-day" aria-label="Día siguiente">${ICONS.chevR}</button>
+          <button class="nav-arrow" data-action="open-calendar" aria-label="Elegir fecha en el calendario">${ICONS.calendar}</button>
+          ${isToday ? '' : `<button class="today-pill" data-action="go-today">Ir a hoy</button>`}
+        </div>
+        <div class="date-big">
+          <span class="dow">${dow}</span>
+          <span class="num">${day}</span><span class="rest">de ${month} de ${year}</span>
+        </div>
+      </div>
+      <div class="weather-block">
+        <span class="weather-label">¿CÓMO ESTÁ EL DÍA?</span>
+        <div class="weather-picker">
+          <button class="weather-btn" data-action="weather" data-w="sol" data-active="${entry.weather==='sol'}" aria-label="Soleado">${ICONS.sun}</button>
+          <button class="weather-btn" data-action="weather" data-w="nube" data-active="${entry.weather==='nube'}" aria-label="Nublado">${ICONS.cloud}</button>
+          <button class="weather-btn" data-action="weather" data-w="lluvia" data-active="${entry.weather==='lluvia'}" aria-label="Lluvioso">${ICONS.rain}</button>
+        </div>
+        <span class="progress-note">Progreso del día: <b>${pct}%</b></span>
+      </div>
+    </header>
+
+    <div class="quote-ribbon">
+      <div class="quote-top">
+        <span class="quote-mark">${ICONS.quote}</span>
+        <textarea class="quote-input" data-field="quote" rows="1" readonly placeholder="Agrega frases desde Configuración…">${escHtml(entry.quote)}</textarea>
+      </div>
+      <div class="quote-actions">
+        <button class="shuffle-btn" data-action="shuffle-quote">${ICONS.shuffle} Nueva frase</button>
+      </div>
+    </div>
+
+    <div class="quote-ribbon grat-ribbon">
+      <div class="quote-top">
+        <span class="quote-mark">${ICONS.thanks}</span>
+        <textarea class="quote-input" data-field="gratitudeText" rows="1" readonly placeholder="Agrega frases desde Configuración…">${escHtml(entry.gratitudeText)}</textarea>
+      </div>
+      <div class="quote-actions">
+        <button class="shuffle-btn" data-action="shuffle-gratitude">${ICONS.shuffle} Nueva frase</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col-left">
+
+        <section class="card">
+          <h2>${ICONS.thanks} Hábitos del día <span class="count">${doneHabits}/${totalHabits}</span></h2>
+          ${cfg.habits.length === 0 ? `<div class="empty-hint">Agrega tus hábitos desde Configuración.</div>` : cfg.habits.map(h => `
+            <div class="habit-row" data-done="${!!entry.habits[h.key]}">
+              <span class="habit-icon">${habitIcon(h.key)}</span>
+              <span class="habit-text">
+                <span class="label">${h.label}</span>
+                ${h.hint ? `<br><span class="hint">${h.hint}</span>` : ''}
+              </span>
+              <button class="habit-toggle" data-action="toggle-habit" data-key="${h.key}" data-done="${!!entry.habits[h.key]}" aria-label="Marcar ${h.label}">${ICONS.check}</button>
+            </div>
+          `).join('')}
+        </section>
+
+        <section class="card">
+          <h2>${ICONS.drop} Consumo de agua</h2>
+          <div class="water-row">
+            ${Array.from({length: cfg.waterGoal}).map((_,i)=>`
+              <button class="drop-btn" data-action="water" data-index="${i}" data-filled="${i < entry.water}" aria-label="Vaso ${i+1}">${ICONS.drop}</button>
+            `).join('')}
+          </div>
+          <span class="water-caption"><b>${entry.water}</b> de ${cfg.waterGoal} vasos</span>
+        </section>
+
+        <section class="card">
+          <h2>${ICONS.flame} Enojo</h2>
+          <div class="counter-row">
+            <div class="counter-display anger">
+              <span class="counter-big">${entry.anger.count}</span>
+              <span class="counter-caption">hoy</span>
+            </div>
+            <button class="counter-btn anger" data-action="count-anger">+1</button>
+            ${entry.anger.count > 0 ? `<button class="counter-reset" data-action="reset-anger">${ICONS.reset} reiniciar</button>` : ''}
+          </div>
+          ${entry.anger.lastMessage ? `<div class="counter-msg">${escHtml(entry.anger.lastMessage)}</div>` : ''}
+        </section>
+
+        <section class="card">
+          <h2>${ICONS.breeze} Ansiedad</h2>
+          <div class="counter-row">
+            <div class="counter-display anxiety">
+              <span class="counter-big">${entry.anxiety.count}</span>
+              <span class="counter-caption">hoy</span>
+            </div>
+            <button class="counter-btn anxiety" data-action="count-anxiety">+1</button>
+            ${entry.anxiety.count > 0 ? `<button class="counter-reset" data-action="reset-anxiety">${ICONS.reset} reiniciar</button>` : ''}
+          </div>
+          ${entry.anxiety.lastMessage ? `<div class="counter-msg anxiety">${escHtml(entry.anxiety.lastMessage)}</div>` : ''}
+        </section>
+
+      </div>
+
+      <div class="col-right">
+
+        <section class="card">
+          <h2>${ICONS.target} Prioridades del día <span class="count">${entry.priorities.filter(p=>p.done).length}/${entry.priorities.length}</span></h2>
+          ${renderChecklist(entry.priorities, 'priority')}
+          <div class="add-row">
+            <input type="text" id="new-priority" placeholder="Agregar una prioridad y presiona Enter…" data-add="priority">
+            <button class="add-btn" data-action="add-priority" aria-label="Agregar prioridad">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>${ICONS.check} Metas diarias <span class="count">${entry.goals.filter(g=>g.done).length}/${entry.goals.length}</span></h2>
+          ${renderChecklist(entry.goals, 'goal')}
+          <div class="add-row">
+            <input type="text" id="new-goal" placeholder="Agregar una meta y presiona Enter…" data-add="goal">
+            <button class="add-btn" data-action="add-goal" aria-label="Agregar meta">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>${ICONS.list} Lista de tareas <span class="count">${doneTasks}/${totalTasks}</span></h2>
+          ${renderChecklist(entry.tasks, 'task')}
+          <div class="add-row">
+            <input type="text" id="new-task" placeholder="Agregar una tarea y presiona Enter…" data-add="task">
+            <button class="add-btn" data-action="add-task" aria-label="Agregar tarea">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>${ICONS.book} Notas</h2>
+          <div class="notes-area">
+            <textarea class="notes-input" data-field="notes" placeholder="Ideas, pendientes, reflexiones…">${escHtml(entry.notes)}</textarea>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <footer class="foot">Los cambios se guardan automáticamente en este navegador. Exporta tu cuaderno de vez en cuando como respaldo.</footer>
+
+    ${settingsOpen ? `
+    <div class="modal-overlay" id="settingsOverlay">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Configuración</h3>
+          <button class="modal-close" data-action="close-settings" aria-label="Cerrar">${ICONS.close}</button>
+        </div>
+
+        <section class="modal-section">
+          <h4>${ICONS.quote} Frases motivacionales</h4>
+          <p class="modal-hint">Estas son las frases que aparecen al presionar "Nueva frase". Agrega, edita o elimina las que quieras.</p>
+          ${cfg.quotes.map((q,i)=>`
+            <div class="quote-list-row">
+              <textarea data-field="quoteText" data-index="${i}" rows="2">${escHtml(q)}</textarea>
+              <button class="row-del" style="opacity:1" data-action="del-quote" data-index="${i}" aria-label="Eliminar frase">${ICONS.trash}</button>
+            </div>
+          `).join('') || `<div class="empty-hint">No tienes frases guardadas. Se usará un banco de reserva.</div>`}
+          <div class="add-row">
+            <input type="text" id="new-quote" placeholder="Escribe una nueva frase y presiona Enter…" data-add="quote">
+            <button class="add-btn" data-action="add-quote" aria-label="Agregar frase">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.thanks} Frases de agradecimiento</h4>
+          <p class="modal-hint">Aparecen debajo de la frase del día y también cambian cada día. Personalízalas como quieras.</p>
+          ${cfg.gratitudePhrases.map((q,i)=>`
+            <div class="quote-list-row">
+              <textarea data-field="gratitudePhraseText" data-index="${i}" rows="2">${escHtml(q)}</textarea>
+              <button class="row-del" style="opacity:1" data-action="del-gratitude-phrase" data-index="${i}" aria-label="Eliminar frase">${ICONS.trash}</button>
+            </div>
+          `).join('') || `<div class="empty-hint">No tienes frases guardadas. Se usará un banco de reserva.</div>`}
+          <div class="add-row">
+            <input type="text" id="new-gratitude-phrase" placeholder="Escribe una nueva frase y presiona Enter…" data-add="gratitude-phrase">
+            <button class="add-btn" data-action="add-gratitude-phrase" aria-label="Agregar frase">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.spark} Hábitos diarios</h4>
+          <p class="modal-hint">Los hábitos que quieres registrar cada día. Puedes editar, borrar o agregar los tuyos.</p>
+          ${cfg.habits.map((h,i)=>`
+            <div class="habit-edit-row">
+              <div class="habit-edit-fields">
+                <input type="text" data-field="habitLabel" data-index="${i}" value="${escAttr(h.label)}" placeholder="Nombre del hábito">
+                <input type="text" data-field="habitHint" data-index="${i}" value="${escAttr(h.hint || '')}" placeholder="Descripción breve (opcional)">
+              </div>
+              <button class="row-del" style="opacity:1" data-action="del-habit" data-index="${i}" aria-label="Eliminar hábito">${ICONS.trash}</button>
+            </div>
+          `).join('') || `<div class="empty-hint">No tienes hábitos configurados.</div>`}
+          <div class="add-row">
+            <input type="text" id="new-habit" placeholder="Escribe un nuevo hábito y presiona Enter…" data-add="habit">
+            <button class="add-btn" data-action="add-habit" aria-label="Agregar hábito">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.flame} Frases para el enojo</h4>
+          <p class="modal-hint">Aparece cada vez que presionas +1 en la tarjeta de Enojo.</p>
+          ${cfg.angerPhrases.map((q,i)=>`
+            <div class="quote-list-row">
+              <textarea data-field="angerPhraseText" data-index="${i}" rows="2">${escHtml(q)}</textarea>
+              <button class="row-del" style="opacity:1" data-action="del-anger-phrase" data-index="${i}" aria-label="Eliminar frase">${ICONS.trash}</button>
+            </div>
+          `).join('') || `<div class="empty-hint">No tienes frases guardadas. Se usará un banco de reserva.</div>`}
+          <div class="add-row">
+            <input type="text" id="new-anger-phrase" placeholder="Escribe una nueva frase y presiona Enter…" data-add="anger-phrase">
+            <button class="add-btn" data-action="add-anger-phrase" aria-label="Agregar frase">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.breeze} Frases para la ansiedad</h4>
+          <p class="modal-hint">Aparece cada vez que presionas +1 en la tarjeta de Ansiedad.</p>
+          ${cfg.anxietyPhrases.map((q,i)=>`
+            <div class="quote-list-row">
+              <textarea data-field="anxietyPhraseText" data-index="${i}" rows="2">${escHtml(q)}</textarea>
+              <button class="row-del" style="opacity:1" data-action="del-anxiety-phrase" data-index="${i}" aria-label="Eliminar frase">${ICONS.trash}</button>
+            </div>
+          `).join('') || `<div class="empty-hint">No tienes frases guardadas. Se usará un banco de reserva.</div>`}
+          <div class="add-row">
+            <input type="text" id="new-anxiety-phrase" placeholder="Escribe una nueva frase y presiona Enter…" data-add="anxiety-phrase">
+            <button class="add-btn" data-action="add-anxiety-phrase" aria-label="Agregar frase">${ICONS.plus}</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.drop} Meta de agua</h4>
+          <p class="modal-hint">Cuántos vasos quieres tomar al día. Esto también ajusta el promedio en Estadísticas y el progreso del día.</p>
+          <div class="water-goal-field">
+            <span>Vasos al día</span>
+            <input type="number" id="water-goal-input" data-field="waterGoal" min="1" max="20" value="${cfg.waterGoal}">
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.download} Datos</h4>
+          <p class="modal-hint">Tu cuaderno se guarda en este navegador. Exporta un respaldo de vez en cuando o impórtalo en otro dispositivo.</p>
+          <div class="modal-actions">
+            <button class="icon-btn" data-action="export">${ICONS.download} Exportar respaldo</button>
+            <button class="icon-btn" data-action="import">${ICONS.upload} Importar respaldo</button>
+          </div>
+        </section>
+      </div>
+    </div>` : ''}
+
+    ${calendarOpen ? renderCalendarModal() : ''}
+    ${statsOpen ? renderStatsModal() : ''}
+  `;
+
+  app.querySelectorAll('.quote-input').forEach(autoGrow);
+  app.querySelectorAll('.quote-list-row textarea').forEach(autoGrow);
+}
+
+function autoGrow(el){
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function renderStatsModal(){
+  const period = statsPeriod;
+  const days = lastNDates(period);
+
+  const angerVals = days.map(d => hist[d] ? hist[d].anger.count : 0);
+  const anxietyVals = days.map(d => hist[d] ? hist[d].anxiety.count : 0);
+  const angerTotal = angerVals.reduce((a,b)=>a+b,0);
+  const anxietyTotal = anxietyVals.reduce((a,b)=>a+b,0);
+
+  const waterSum = days.reduce((s,d)=> s + (hist[d] ? hist[d].water : 0), 0);
+  const waterAvg = (waterSum / period).toFixed(1);
+
+  const habitRows = cfg.habits.length === 0 ? `<div class="empty-hint">Agrega tus hábitos desde Configuración.</div>` : cfg.habits.map(h=>{
+    const doneDays = days.filter(d => hist[d] && hist[d].habits && hist[d].habits[h.key]).length;
+    const streak = habitStreak(h.key);
+    return `
+      <div class="habit-row">
+        <span class="habit-icon">${habitIcon(h.key)}</span>
+        <span class="habit-text">
+          <span class="label">${h.label}</span><br>
+          <span class="hint">${doneDays}/${period} días en el periodo</span>
+        </span>
+        <span class="streak-badge">${streak === 1 ? '1 día seguido' : streak + ' días seguidos'}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="modal-overlay" id="statsOverlay">
+      <div class="modal-card" style="max-width:560px;">
+        <div class="modal-head">
+          <h3>Tus patrones</h3>
+          <button class="modal-close" data-action="close-stats" aria-label="Cerrar">${ICONS.close}</button>
+        </div>
+
+        <section class="modal-section">
+          <div class="stats-period-toggle">
+            <button class="period-btn" data-action="stats-period-7" data-active="${period===7}">Últimos 7 días</button>
+            <button class="period-btn" data-action="stats-period-30" data-active="${period===30}">Últimos 30 días</button>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.chart} Enojo y ansiedad por día</h4>
+          <p class="modal-hint">Total del periodo: ${angerTotal} de enojo, ${anxietyTotal} de ansiedad. Fíjate si hay días o rachas que se repiten.</p>
+          ${buildMoodChartSVG(days, angerVals, anxietyVals)}
+          <div class="chart-legend">
+            <span><span class="dot anger"></span>Enojo</span>
+            <span><span class="dot anxiety"></span>Ansiedad</span>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.check} Racha y consistencia de hábitos</h4>
+          ${habitRows}
+        </section>
+
+        <section class="modal-section">
+          <h4>${ICONS.drop} Agua</h4>
+          <p class="modal-hint" style="margin:0;">Promedio de los últimos ${period} días: <b style="color:var(--ink);">${waterAvg}</b> de ${cfg.waterGoal} vasos por día.</p>
+        </section>
+      </div>
+    </div>`;
+}
+
+function renderCalendarModal(){
+  if(calendarYear === null){
+    const d = new Date(currentDate + 'T00:00:00');
+    calendarYear = d.getFullYear();
+    calendarMonth = d.getMonth();
+  }
+  const monthLabel = new Date(calendarYear, calendarMonth, 1).toLocaleDateString('es-ES', {month:'long', year:'numeric'});
+  const cells = buildCalendarCells(calendarYear, calendarMonth);
+  const today = todayStr();
+
+  return `
+    <div class="modal-overlay" id="calendarOverlay">
+      <div class="modal-card" style="max-width:340px;">
+        <div class="modal-head">
+          <h3>Elegir fecha</h3>
+          <button class="modal-close" data-action="close-calendar" aria-label="Cerrar">${ICONS.close}</button>
+        </div>
+        <section class="modal-section">
+          <div class="cal-head">
+            <button class="nav-arrow" data-action="cal-prev-month" aria-label="Mes anterior">${ICONS.chevL}</button>
+            <span class="cal-month-label">${monthLabel}</span>
+            <button class="nav-arrow" data-action="cal-next-month" aria-label="Mes siguiente">${ICONS.chevR}</button>
+          </div>
+          <div class="cal-grid">
+            ${WEEKDAY_LABELS.map(w => `<span class="cal-weekday">${w}</span>`).join('')}
+            ${cells.map(dateStr=>{
+              if(!dateStr) return `<span class="cal-day cal-empty"></span>`;
+              const classes = ['cal-day'];
+              if(dateStr === currentDate) classes.push('cal-selected');
+              if(dateStr === today) classes.push('cal-today');
+              if(hasPendingOnDate(dateStr)) classes.push('cal-pending');
+              const day = parseInt(dateStr.slice(-2),10);
+              return `<button class="${classes.join(' ')}" data-action="pick-date" data-date="${dateStr}">${day}</button>`;
+            }).join('')}
+          </div>
+          <p class="modal-hint" style="margin-top:12px;"><span class="cal-legend-dot"></span> quedaron pendientes ese día</p>
+        </section>
+      </div>
+    </div>`;
+}
+
+function renderBackupBanner(){
+  const today = todayStr();
+  if(cfg.backupBannerDismissedOn === today) return '';
+  const days = daysSinceExport();
+  if(days < EXPORT_REMINDER_DAYS) return '';
+
+  const msg = cfg.lastExportDate
+    ? `Han pasado ${days} días desde tu último respaldo.`
+    : `Llevas ${days} días usando tu cuaderno y todavía no has exportado un respaldo.`;
+
+  return `
+    <div class="backup-banner">
+      <span class="backup-icon">${ICONS.alert}</span>
+      <span class="msg">${msg} Expórtalo para no perder tu historial si algo le pasa a este navegador.</span>
+      <button class="export-now" data-action="export-now-banner">${ICONS.download} Exportar ahora</button>
+      <button class="dismiss" data-action="dismiss-banner" aria-label="Cerrar aviso">${ICONS.close}</button>
+    </div>`;
+}
+
+function renderChecklist(items, kind){
+  if(!items.length) return `<div class="empty-hint">Todavía no hay nada aquí.</div>`;
+  return items.map((it,i)=>`
+    <div class="list-row" data-done="${!!it.done}">
+      <button class="check-box" data-action="toggle-${kind}" data-index="${i}" data-done="${!!it.done}" aria-label="Marcar como hecho">${ICONS.check}</button>
+      <input type="text" data-field="${kind}Text" data-index="${i}" value="${escAttr(it.text)}">
+      ${it.carried ? `<span class="carried-tag${it.carriedDays >= 3 ? ' warn' : ''}">hace ${it.carriedDays} día${it.carriedDays > 1 ? 's' : ''}</span>` : ''}
+      <button class="row-del" data-action="del-${kind}" data-index="${i}" aria-label="Eliminar">${ICONS.trash}</button>
+    </div>
+  `).join('');
+}
+
+function escAttr(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+function escHtml(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+}
+
+/* ============================= Eventos ============================= */
+const app = document.getElementById('app');
+
+app.addEventListener('input', (e)=>{
+  const el = e.target;
+  const entry = getEntry(currentDate);
+  const field = el.dataset.field;
+  if(!field) return;
+  const idx = el.dataset.index !== undefined ? parseInt(el.dataset.index,10) : null;
+
+  if(field === 'quote'){ entry.quote = el.value; autoGrow(el); }
+  else if(field === 'priorityText'){ entry.priorities[idx].text = el.value; }
+  else if(field === 'gratitudeText'){ entry.gratitudeText = el.value; autoGrow(el); }
+  else if(field === 'notes'){ entry.notes = el.value; }
+  else if(field === 'goalText'){ entry.goals[idx].text = el.value; }
+  else if(field === 'taskText'){ entry.tasks[idx].text = el.value; }
+  else if(field === 'quoteText'){ cfg.quotes[idx] = el.value; autoGrow(el); }
+  else if(field === 'gratitudePhraseText'){ cfg.gratitudePhrases[idx] = el.value; autoGrow(el); }
+  else if(field === 'angerPhraseText'){ cfg.angerPhrases[idx] = el.value; autoGrow(el); }
+  else if(field === 'anxietyPhraseText'){ cfg.anxietyPhrases[idx] = el.value; autoGrow(el); }
+  else if(field === 'habitLabel'){ cfg.habits[idx].label = el.value; }
+  else if(field === 'habitHint'){ cfg.habits[idx].hint = el.value; }
+  else if(field === 'waterGoal'){
+    const v = parseInt(el.value, 10);
+    if(!isNaN(v) && v >= 1 && v <= 20){ cfg.waterGoal = v; }
+  }
+  scheduleSave();
+});
+
+app.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && e.target.dataset.add){
+    e.preventDefault();
+    const kind = e.target.dataset.add;
+    if(kind === 'goal') addItem('goals', e.target);
+    if(kind === 'task') addItem('tasks', e.target);
+    if(kind === 'priority') addItem('priorities', e.target);
+    if(kind === 'quote') addQuote(e.target);
+    if(kind === 'gratitude-phrase') addGratitudePhrase(e.target);
+    if(kind === 'anger-phrase') addBankPhrase('angerPhrases', e.target);
+    if(kind === 'anxiety-phrase') addBankPhrase('anxietyPhrases', e.target);
+    if(kind === 'habit') addHabit(e.target);
+  }
+});
+
+app.addEventListener('click', (e)=>{
+  if(e.target.id === 'settingsOverlay'){ settingsOpen = false; render(); return; }
+  if(e.target.id === 'calendarOverlay'){ calendarOpen = false; render(); return; }
+  if(e.target.id === 'statsOverlay'){ statsOpen = false; render(); return; }
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const entry = getEntry(currentDate);
+
+  switch(action){
+    case 'prev-day': currentDate = shiftDate(currentDate, -1); render(); break;
+    case 'next-day': currentDate = shiftDate(currentDate, 1); render(); break;
+    case 'go-today': currentDate = todayStr(); render(); break;
+
+    case 'weather': {
+      const w = btn.dataset.w;
+      entry.weather = (entry.weather === w) ? null : w;
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'shuffle-quote': {
+      const pool = (cfg.quotes && cfg.quotes.length) ? cfg.quotes : DEFAULT_QUOTES;
+      let q = entry.quote;
+      let next = q;
+      if(pool.length === 1){ next = pool[0]; }
+      else{ while(next === q){ next = pool[Math.floor(Math.random()*pool.length)]; } }
+      entry.quote = next;
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'shuffle-gratitude': {
+      const pool = (cfg.gratitudePhrases && cfg.gratitudePhrases.length) ? cfg.gratitudePhrases : DEFAULT_GRATITUDE;
+      let q = entry.gratitudeText;
+      let next = q;
+      if(pool.length === 1){ next = pool[0]; }
+      else{ while(next === q){ next = pool[Math.floor(Math.random()*pool.length)]; } }
+      entry.gratitudeText = next;
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'open-calendar': {
+      const d = new Date(currentDate + 'T00:00:00');
+      calendarYear = d.getFullYear();
+      calendarMonth = d.getMonth();
+      calendarOpen = true;
+      render();
+      break;
+    }
+    case 'close-calendar': calendarOpen = false; render(); break;
+    case 'cal-prev-month': {
+      calendarMonth--;
+      if(calendarMonth < 0){ calendarMonth = 11; calendarYear--; }
+      render();
+      break;
+    }
+    case 'cal-next-month': {
+      calendarMonth++;
+      if(calendarMonth > 11){ calendarMonth = 0; calendarYear++; }
+      render();
+      break;
+    }
+    case 'pick-date': {
+      currentDate = btn.dataset.date;
+      calendarOpen = false;
+      render();
+      break;
+    }
+
+    case 'open-stats': statsOpen = true; render(); break;
+    case 'close-stats': statsOpen = false; render(); break;
+    case 'stats-period-7': statsPeriod = 7; render(); break;
+    case 'stats-period-30': statsPeriod = 30; render(); break;
+
+    case 'add-habit': addHabit(document.getElementById('new-habit')); break;
+    case 'del-habit': {
+      const i = parseInt(btn.dataset.index,10);
+      const h = cfg.habits[i];
+      const ok = window.confirm(`¿Eliminar el hábito "${h.label}"? Dejará de aparecer para registrar (tu historial pasado de este hábito no se borra, solo deja de mostrarse).`);
+      if(ok){ cfg.habits.splice(i,1); scheduleSave(); render(); }
+      break;
+    }
+
+    case 'open-settings': settingsOpen = true; render(); break;
+    case 'close-settings': settingsOpen = false; render(); break;
+
+    case 'add-quote': addQuote(document.getElementById('new-quote')); break;
+    case 'del-quote': {
+      const i = parseInt(btn.dataset.index,10);
+      cfg.quotes.splice(i,1);
+      scheduleSave(); render();
+      break;
+    }
+    case 'add-gratitude-phrase': addGratitudePhrase(document.getElementById('new-gratitude-phrase')); break;
+    case 'del-gratitude-phrase': {
+      const i = parseInt(btn.dataset.index,10);
+      cfg.gratitudePhrases.splice(i,1);
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'toggle-habit': {
+      const key = btn.dataset.key;
+      entry.habits[key] = !entry.habits[key];
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'water': {
+      const i = parseInt(btn.dataset.index,10);
+      entry.water = (entry.water === i+1) ? i : i+1;
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'add-goal': addItem('goals', document.getElementById('new-goal')); break;
+    case 'add-task': addItem('tasks', document.getElementById('new-task')); break;
+    case 'add-priority': addItem('priorities', document.getElementById('new-priority')); break;
+
+    case 'toggle-goal': toggleItem('goals', btn); break;
+    case 'toggle-task': toggleItem('tasks', btn); break;
+    case 'toggle-priority': toggleItem('priorities', btn); break;
+    case 'del-goal': delItem('goals', btn); break;
+    case 'del-task': delItem('tasks', btn); break;
+    case 'del-priority': delItem('priorities', btn); break;
+
+    case 'count-anger': {
+      entry.anger.count += 1;
+      const pool = (cfg.angerPhrases && cfg.angerPhrases.length) ? cfg.angerPhrases : DEFAULT_ANGER_PHRASES;
+      entry.anger.lastMessage = pickRandomDistinct(pool, entry.anger.lastMessage);
+      scheduleSave(); render();
+      break;
+    }
+    case 'reset-anger': {
+      entry.anger.count = 0; entry.anger.lastMessage = '';
+      scheduleSave(); render();
+      break;
+    }
+    case 'count-anxiety': {
+      entry.anxiety.count += 1;
+      const pool = (cfg.anxietyPhrases && cfg.anxietyPhrases.length) ? cfg.anxietyPhrases : DEFAULT_ANXIETY_PHRASES;
+      entry.anxiety.lastMessage = pickRandomDistinct(pool, entry.anxiety.lastMessage);
+      scheduleSave(); render();
+      break;
+    }
+    case 'reset-anxiety': {
+      entry.anxiety.count = 0; entry.anxiety.lastMessage = '';
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'add-anger-phrase': addBankPhrase('angerPhrases', document.getElementById('new-anger-phrase')); break;
+    case 'del-anger-phrase': {
+      const i = parseInt(btn.dataset.index,10);
+      cfg.angerPhrases.splice(i,1);
+      scheduleSave(); render();
+      break;
+    }
+    case 'add-anxiety-phrase': addBankPhrase('anxietyPhrases', document.getElementById('new-anxiety-phrase')); break;
+    case 'del-anxiety-phrase': {
+      const i = parseInt(btn.dataset.index,10);
+      cfg.anxietyPhrases.splice(i,1);
+      scheduleSave(); render();
+      break;
+    }
+
+    case 'export': exportData(); render(); break;
+    case 'export-now-banner': exportData(); render(); break;
+    case 'dismiss-banner': {
+      cfg.backupBannerDismissedOn = todayStr();
+      scheduleSave(); render();
+      break;
+    }
+    case 'import': document.getElementById('importInput').click(); break;
+  }
+});
+
+function addItem(listKey, inputEl){
+  const val = (inputEl.value || '').trim();
+  if(!val) return;
+  const entry = getEntry(currentDate);
+  entry[listKey].push({text: val, done:false});
+  inputEl.value = '';
+  scheduleSave(); render();
+}
+function addQuote(inputEl){
+  const val = (inputEl.value || '').trim();
+  if(!val) return;
+  cfg.quotes.push(val);
+  inputEl.value = '';
+  scheduleSave(); render();
+}
+function addHabit(inputEl){
+  const val = (inputEl.value || '').trim();
+  if(!val) return;
+  const key = 'custom_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  cfg.habits.push({key, label: val, hint: ''});
+  inputEl.value = '';
+  scheduleSave(); render();
+}
+function addBankPhrase(bankKey, inputEl){
+  const val = (inputEl.value || '').trim();
+  if(!val) return;
+  cfg[bankKey].push(val);
+  inputEl.value = '';
+  scheduleSave(); render();
+}
+function addGratitudePhrase(inputEl){
+  const val = (inputEl.value || '').trim();
+  if(!val) return;
+  cfg.gratitudePhrases.push(val);
+  inputEl.value = '';
+  scheduleSave(); render();
+}
+function toggleItem(listKey, btn){
+  const i = parseInt(btn.dataset.index,10);
+  const entry = getEntry(currentDate);
+  entry[listKey][i].done = !entry[listKey][i].done;
+  scheduleSave(); render();
+}
+function delItem(listKey, btn){
+  const i = parseInt(btn.dataset.index,10);
+  const entry = getEntry(currentDate);
+  const item = entry[listKey][i];
+  if(item && item.carriedDays > 0){
+    const label = item.carriedDays === 1 ? '1 día' : `${item.carriedDays} días`;
+    const ok = window.confirm(`Esto lleva ${label} pendiente. ¿Seguro que quieres eliminarlo? No se puede deshacer.`);
+    if(!ok) return;
+  }
+  entry[listKey].splice(i,1);
+  scheduleSave(); render();
+}
+
+/* ============================= Exportar / Importar ============================= */
+function exportData(){
+  const payload = { cfg, hist, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `planeador-diario-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  cfg.lastExportDate = todayStr();
+  scheduleSave();
+}
+
+document.getElementById('importInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(data.cfg) cfg = data.cfg;
+      if(data.hist) hist = data.hist;
+      if(typeof cfg.waterGoal !== 'number') cfg.waterGoal = 8;
+      if(!Array.isArray(cfg.quotes)) cfg.quotes = INITIAL_USER_QUOTES.slice();
+      if(!Array.isArray(cfg.gratitudePhrases)) cfg.gratitudePhrases = INITIAL_USER_GRATITUDE.slice();
+      if(!Array.isArray(cfg.angerPhrases)) cfg.angerPhrases = INITIAL_USER_ANGER_PHRASES.slice();
+      if(!Array.isArray(cfg.anxietyPhrases)) cfg.anxietyPhrases = INITIAL_USER_ANXIETY_PHRASES.slice();
+      if(!Array.isArray(cfg.habits)) cfg.habits = HABIT_DEFAULTS.map(h => ({...h}));
+      scheduleSave();
+      render();
+      alert('Cuaderno importado correctamente.');
+    }catch(err){
+      alert('No se pudo leer el archivo. Verifica que sea un respaldo válido (.json).');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ============================= Inicio ============================= */
+loadState();
+runDailyRollover();
+render();
+</script>
+</body>
+</html>
