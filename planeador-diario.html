@@ -829,12 +829,9 @@ function longDate(dateStr){
   return {dow, day, month, year};
 }
 
-/* ============================= Render ============================= */
-function render(){
-  const entry = getEntry(currentDate);
-  const {dow, day, month, year} = longDate(currentDate);
-  const isToday = currentDate === todayStr();
-
+/* Calcula el % de progreso del día a partir de una entrada. Se usa tanto en el render completo
+   como en la actualización rápida (sin redibujar todo) cuando se escribe en Notas. */
+function computeProgress(entry){
   const totalHabits = cfg.habits.length;
   const doneHabits = cfg.habits.filter(h => entry.habits[h.key]).length;
   const totalTasks = entry.tasks.length;
@@ -844,11 +841,31 @@ function render(){
   const totalPriorities = entry.priorities.length;
   const donePriorities = entry.priorities.filter(p=>p.done).length;
   const waterDone = entry.water >= cfg.waterGoal ? 1 : 0;
-  const notesDone = entry.notes.trim() ? 0 : 1; // las notas cuentan como resueltas cuando ya las vaciaste a su lugar
+  // Las notas solo entran a la cuenta cuando hay algo escrito por repartir a su lugar correspondiente;
+  // si el campo está vacío (no has escrito nada, o ya lo vaciaste), no suma ni resta.
+  const notesPending = entry.notes.trim() ? 1 : 0;
 
-  const totalUnits = totalHabits + 1 /* agua */ + 1 /* notas */ + totalTasks + totalGoals + totalPriorities;
-  const doneUnits = doneHabits + waterDone + notesDone + doneTasks + doneGoals + donePriorities;
+  const totalUnits = totalHabits + 1 /* agua */ + notesPending + totalTasks + totalGoals + totalPriorities;
+  const doneUnits = doneHabits + waterDone + doneTasks + doneGoals + donePriorities;
   const pct = totalUnits ? Math.round((doneUnits/totalUnits)*100) : 0;
+  return {totalHabits, doneHabits, totalTasks, doneTasks, totalGoals, doneGoals, totalPriorities, donePriorities, pct};
+}
+
+/* Actualiza solo el número de progreso en pantalla, sin redibujar todo (para no perder el cursor
+   mientras se escribe en Notas). */
+function updateProgressBadge(){
+  const entry = getEntry(currentDate);
+  const {pct} = computeProgress(entry);
+  const el = document.querySelector('.progress-note b');
+  if(el) el.textContent = pct + '%';
+}
+
+/* ============================= Render ============================= */
+function render(){
+  const entry = getEntry(currentDate);
+  const {dow, day, month, year} = longDate(currentDate);
+  const isToday = currentDate === todayStr();
+  const {totalHabits, doneHabits, totalTasks, doneTasks, totalGoals, doneGoals, totalPriorities, donePriorities, pct} = computeProgress(entry);
 
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -1280,7 +1297,7 @@ app.addEventListener('input', (e)=>{
   if(field === 'quote'){ entry.quote = el.value; autoGrow(el); }
   else if(field === 'priorityText'){ entry.priorities[idx].text = el.value; }
   else if(field === 'gratitudeText'){ entry.gratitudeText = el.value; autoGrow(el); }
-  else if(field === 'notes'){ entry.notes = el.value; }
+  else if(field === 'notes'){ entry.notes = el.value; updateProgressBadge(); }
   else if(field === 'goalText'){ entry.goals[idx].text = el.value; }
   else if(field === 'taskText'){ entry.tasks[idx].text = el.value; }
   else if(field === 'quoteText'){ cfg.quotes[idx] = el.value; autoGrow(el); }
